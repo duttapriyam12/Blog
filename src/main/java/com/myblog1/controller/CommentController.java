@@ -26,6 +26,19 @@ public class CommentController {
         List<CommentDto> listOfComments = commentService.getCommentsByPostId(postId);
         return new ResponseEntity<>(listOfComments, HttpStatus.OK);
     }
+    @PutMapping
+    public ResponseEntity<CommentDto> updateComment(@RequestParam long postId, @RequestParam long commentId, @RequestBody CommentDto commentDto){
+        CommentDto dto = commentService.updateComment(postId, commentId, commentDto);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteComment(@RequestParam long postId, @RequestParam long commentId) {
+        commentService.deleteComment(postId, commentId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
 
 
 }

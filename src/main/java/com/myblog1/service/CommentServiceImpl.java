@@ -8,6 +8,7 @@ import com.myblog1.repository.CommentRepository;
 import com.myblog1.repository.PostRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,6 +46,43 @@ public class CommentServiceImpl implements CommentService{
                 .map(comment -> mapToDto(comment))
                 .collect(Collectors.toList());
         return dtos;
+    }
+
+    @Override
+    public CommentDto updateComment(long postId, long commentId, CommentDto commentDto) {
+        // Find comments by postId
+        List<Comment> comments = commentRepository.findByPostId(postId);
+
+        // Check if commentId exists within the list of comments for the given postId
+        Comment comment = comments.stream()
+                .filter(c -> c.getId() == commentId)
+                .findFirst()
+                .orElseThrow(() -> new PostNotFoundException("Comment not found for postId: " + postId + " and commentId: " + commentId));
+
+        // Update the found comment
+        comment.setBody(commentDto.getBody());
+        comment.setName(commentDto.getName());
+        comment.setEmail(commentDto.getEmail());
+
+        // Save the updated comment
+        Comment updatedComment = commentRepository.save(comment);
+
+        return mapToDto(updatedComment);
+    }
+
+    @Override
+    public void deleteComment(long postId, long commentId) {
+        // Find comments by postId
+        List<Comment> comments = commentRepository.findByPostId(postId);
+
+        // Check if commentId exists within the list of comments for the given postId
+        Comment comment = comments.stream()
+                .filter(c -> c.getId().equals(commentId))
+                .findFirst()
+                .orElseThrow(() -> new PostNotFoundException("Comment not found for postId: " + postId + " and commentId: " + commentId));
+
+        // Delete the comment
+        commentRepository.delete(comment);
     }
 
 
