@@ -1,5 +1,6 @@
 package com.myblog1.controller;
 
+import com.myblog1.entity.Post;
 import com.myblog1.payload.PostDto;
 import com.myblog1.service.PostService;
 import jakarta.validation.Valid;
@@ -57,7 +58,28 @@ public class PostController {
          return new ResponseEntity<>(dto, HttpStatus.OK);
      }
 
-     @DeleteMapping
+    @PutMapping("/{id}/like")
+    public ResponseEntity<String> likePost(@PathVariable Long id) {
+        Post post = postService.getPostById(id);
+        post.setLikeCount(post.getLikeCount() + 1); // Increment the like count
+        postService.save(post); // Save the updated post
+        return ResponseEntity.ok("Post liked!");
+    }
+
+    @PutMapping("/{id}/dislike")
+    public ResponseEntity<String> unlikePost(@PathVariable Long id) {
+        Post post = postService.getPostById(id);
+        // Ensure like count doesn't go below zero
+        if (post.getLikeCount() > 0) {
+            post.setLikeCount(post.getLikeCount() - 1); // Decrement the like count
+            postService.save(post); // Save the updated post
+            return ResponseEntity.ok("Post disliked!");
+        } else {
+            return ResponseEntity.ok("Post has no likes to remove.");
+        }
+    }
+
+    @DeleteMapping
     public ResponseEntity<String> deletePostById(@RequestParam Long id){
           postService.deletePostById(id);
           return new ResponseEntity<>("Post deleted", HttpStatus.OK);
